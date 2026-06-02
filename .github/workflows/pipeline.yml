@@ -1,0 +1,60 @@
+# This workflow runs automatically every time you push to main
+name: Terraform Azure Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Step 1 — Download your code onto GitHub's server
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2 — Install Terraform on GitHub's server
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.5
+
+      # Step 3 — Log in to Azure using your secrets
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Step 4 — Run terraform init inside the terraform folder
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+        env:
+          ARM_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET:   ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
+
+      # Step 5 — Show what Terraform plans to do
+      - name: Terraform Plan
+        working-directory: ./terraform
+        run: terraform plan
+        env:
+          ARM_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET:   ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
+
+      # Step 6 — Apply the infrastructure changes automatically
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: terraform apply -auto-approve
+        env:
+          ARM_CLIENT_ID:       ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_CLIENT_SECRET:   ${{ secrets.AZURE_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID:       ${{ secrets.AZURE_TENANT_ID }}
