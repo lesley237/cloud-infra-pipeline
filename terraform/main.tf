@@ -1,5 +1,12 @@
 # Tell Terraform we are using Azure and specify the version
 terraform {
+  backend "azurerm" {
+    resource_group_name  = "cloud-infra-pipeline-dev-rg"
+    storage_account_name = "cloudpipelinedevsa"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
+  
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
