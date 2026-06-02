@@ -1,0 +1,35 @@
+# Tells Kubernetes: run 2 copies of our app container
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-pipeline-app
+  labels:
+    app: cloud-pipeline-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloud-pipeline-app
+  template:
+    metadata:
+      labels:
+        app: cloud-pipeline-app
+    spec:
+      containers:
+      - name: cloud-pipeline-app
+        image: lesley237/cloud-pipeline-app:v1
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 30

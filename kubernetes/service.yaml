@@ -1,0 +1,13 @@
+# Exposes the app so you can visit it in a browser
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloud-pipeline-app
+spec:
+  type: NodePort
+  selector:
+    app: cloud-pipeline-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 5000
