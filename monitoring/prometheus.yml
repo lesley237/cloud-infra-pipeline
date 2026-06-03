@@ -1,0 +1,18 @@
+# Global settings — how often Prometheus collects metrics
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+# What to monitor — these are called scrape jobs
+scrape_configs:
+
+  # Job 1 — Monitor Prometheus itself
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Job 2 — Monitor your local machine's system metrics
+  # (CPU, memory, disk) via node-exporter
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
