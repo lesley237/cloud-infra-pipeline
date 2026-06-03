@@ -1,0 +1,58 @@
+---
+# This playbook configures a machine for the cloud-infra-pipeline project
+- name: Configure Cloud Infrastructure Pipeline Environment
+  hosts: local
+  gather_facts: yes
+
+  tasks:
+
+    # Task 1 — Print a message so we can see Ansible is running
+    - name: Show environment info
+      debug:
+        msg: "Configuring {{ ansible_hostname }} running {{ ansible_os_family }}"
+
+    # Task 2 — Create the project working directory
+    - name: Create project logs directory
+      file:
+        path: "./ansible-output"
+        state: directory
+        mode: '0755'
+
+# Task 3 — Install pip then Python packages
+    - name: Install pip3 on Alpine
+      command: apk add --no-cache py3-pip
+      changed_when: false
+
+    - name: Install required Python packages
+      pip:
+        name:
+          - requests
+          - pyyaml
+          - boto3
+        state: present
+        executable: pip3
+        extra_args: "--break-system-packages"
+        
+    # Task 4 — Write environment info to a file
+    - name: Write environment summary to file
+      copy:
+        content: |
+          Pipeline Environment Summary
+          ============================
+          Hostname : {{ ansible_hostname }}
+          OS       : {{ ansible_os_family }}
+          Python   : {{ ansible_python_version }}
+          Configured by Ansible
+        dest: "./ansible-output/environment-summary.txt"
+
+    # Task 5 — Confirm Docker is accessible
+    - name: Check Docker is available
+      command: docker --version
+      register: docker_version
+      changed_when: false
+      ignore_errors: yes
+
+    # Task 6 — Print Docker version
+    - name: Show Docker version
+      debug:
+        msg: "Docker found: {{ docker_version.stdout }}"

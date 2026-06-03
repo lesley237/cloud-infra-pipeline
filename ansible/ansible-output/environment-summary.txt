@@ -1,0 +1,6 @@
+Pipeline Environment Summary
+============================
+Hostname : 2da435723d4f
+OS       : Alpine
+Python   : 3.12.13
+Configured by Ansible
